@@ -1,18 +1,22 @@
 import { handleColorRule } from "../rules/color.rule.js";
 
-const handleIncomingMessage = async (client, message) => {
-  const text = message.body.trim().toLowerCase();
+const handleIncomingMessage = async (sock, msg) => {
+  const from = msg.key.remoteJid;
+  const text = msg.message?.conversation?.trim().toLowerCase();
 
-  if (text === 'hola') {
-    await client.sendText(
-      message.from,
-      'Hola amigo, soy un bot, elige una opción:\n1.- rojo\n2.- azul\n3.- verde'
-    );
+  console.log(msg)
+
+  if (!text) return;
+
+  if (text === "hola") {
+    await sock.sendMessage(from, {
+      text: "Hola amigo, soy un bot, elige una opción:\n1.- rojo\n2.- azul\n3.- verde",
+    });
     return;
   }
 
-  if (['1', '2', '3'].includes(text)) {
-    await handleColorRule(client, message.from, text);
+  if (["1", "2", "3"].includes(text)) {
+    await handleColorRule(sock, from, text);
   }
 };
 

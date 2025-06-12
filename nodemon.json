@@ -1,0 +1,5 @@
+{
+  "watch": ["src"],
+  "ignore": ["src/config/bot/auth", "tokens", "auth"],
+  "ext": "js,json"
+}

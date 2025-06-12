@@ -1,19 +1,19 @@
-export const handleColorRule = async (client, from, option) => {
-  let response = '';
+export const handleColorRule = async (sock, from, option) => {
+  let response = "";
 
   switch (option) {
-    case '1':
-      response = 'Perfecto, te hablaré del color rojo.';
+    case "1":
+      response = "Perfecto, te hablaré del color rojo.";
       break;
-    case '2':
-      response = 'Perfecto, te hablaré del color azul.';
+    case "2":
+      response = "Perfecto, te hablaré del color azul.";
       break;
-    case '3':
-      response = 'Perfecto, te hablaré del color verde.';
+    case "3":
+      response = "Perfecto, te hablaré del color verde.";
       break;
     default:
-      response = 'Opción no válida.';
+      response = "Opción no válida.";
   }
 
-  await client.sendText(from, response);
+  await sock.sendMessage(from, { text: response });
 };
