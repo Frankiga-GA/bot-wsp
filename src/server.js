@@ -21,10 +21,6 @@ class Server {
     this.app.use(express.json());
   }
 
-
-
-
-  // Define your routes here
   routes() {
   }
 
