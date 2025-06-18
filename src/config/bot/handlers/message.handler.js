@@ -7,7 +7,7 @@ const handleIncomingMessage = async (sock, msg) => {
   if (!text) return;
 
   // comandos especificos
-  if (text.toLowerCase() === "ayuda") {
+  if (text.toLowerCase() === "prueba") {
     await sock.sendMessage(from, {
       text: "📌 Soy un bot inteligente. Solo escribe tu consulta y te responderé.",
     });
