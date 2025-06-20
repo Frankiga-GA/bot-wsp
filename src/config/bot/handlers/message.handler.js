@@ -1,19 +1,22 @@
-import { handleColorRule } from "../rules/color.rule.js";
+import { askLLM } from "../../../services/LLM/index.js";
 
-const handleIncomingMessage = async (client, message) => {
-  const text = message.body.trim().toLowerCase();
+const handleIncomingMessage = async (sock, msg) => {
+  const from = msg.key.remoteJid;
+  const text = msg.message?.conversation?.trim();
 
-  if (text === 'hola') {
-    await client.sendText(
-      message.from,
-      'Hola amigo, soy un bot, elige una opción:\n1.- rojo\n2.- azul\n3.- verde'
-    );
+  if (!text) return;
+
+  // comandos especificos
+  if (text.toLowerCase() === "prueba") {
+    await sock.sendMessage(from, {
+      text: "📌 Soy un bot inteligente. Solo escribe tu consulta y te responderé.",
+    });
     return;
   }
 
-  if (['1', '2', '3'].includes(text)) {
-    await handleColorRule(client, message.from, text);
-  }
+  // Interacciòn directa con el bot
+  const respuesta = await askLLM(text);
+  await sock.sendMessage(from, { text: respuesta });
 };
 
 export default handleIncomingMessage;
