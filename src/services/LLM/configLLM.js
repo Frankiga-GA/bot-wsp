@@ -1,2 +1,2 @@
-//export const currentLLM = "openrouter";
-export const currentLLM = "openai";
+export const currentLLM = "openrouter";
+//export const currentLLM = "openai";
