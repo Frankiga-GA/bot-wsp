@@ -26,3 +26,32 @@ export async function getAllMessagesByUser(userNumber) {
     return [];
   }
 }
+
+
+export async function getMessagesAPI(req, res) {
+  try {
+    const messages = await MessageModel.find().sort({ createdAt: -1 });
+    res.json({ messages });
+  } catch (error) {
+    res.status(500).json({ error: "Error obteniendo todos los mensajes" });
+  }
+}
+
+
+export async function getMessagesByUserAPI(req, res) {
+  let { numero } = req.params;
+
+  // 🧼 Limpia el número: solo dígitos
+  numero = numero.replace(/[^0-9]/g, "");
+
+  // 🧩 Agrega el sufijo para buscar en Mongo
+  const numeroWhatsApp = `${numero}@s.whatsapp.net`;
+
+  try {
+    const mensajes = await MessageModel.find({ userNumber: numeroWhatsApp }).sort({ createdAt: 1 });
+    res.json({ messages: mensajes });
+  } catch (error) {
+    console.error("❌ Error en getMessagesByUserAPI:", error.message);
+    res.status(500).json({ error: "Error al obtener mensajes por número" });
+  }
+}
