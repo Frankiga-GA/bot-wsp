@@ -1,5 +1,10 @@
 import express from "express";
+import dotenv from "dotenv";
 import startBot from "./config/bot/client.js";
+import { connectToMongo } from "./config/mongodb/connection.js";
+import { countMessages } from "./modules/shared/message.controller.js";
+
+dotenv.config();
 
 class Server {
   constructor() {
@@ -8,7 +13,16 @@ class Server {
 
     this.middlewares();
     this.routes();
-    this.startWhatsAppBot();
+    this.init();
+  }
+
+  async init() {
+    await connectToMongo();
+
+    const total = await countMessages();
+    console.log(`📊 Mensajes registrados en MongoDB: ${total}`);
+
+    await this.startWhatsAppBot();
   }
 
   listen() {
@@ -21,8 +35,7 @@ class Server {
     this.app.use(express.json());
   }
 
-  routes() {
-  }
+  routes() {}
 
   async startWhatsAppBot() {
     await startBot();
