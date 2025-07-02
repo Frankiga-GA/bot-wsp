@@ -2,154 +2,60 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>📬 CRM - Historial de Mensajes</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f0f2f5;
-      padding: 20px;
-      color: #333;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .busqueda {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    input {
-      padding: 10px;
-      width: 280px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      padding: 10px 15px;
-      font-size: 16px;
-      border: none;
-      background-color: #006eff;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0053cc;
-    }
-
-    .chat-container {
-      max-width: 800px;
-      margin: auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .mensaje {
-      margin-bottom: 15px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .mensaje .numero {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .burbuja {
-      max-width: 80%;
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 5px;
-    }
-
-    .usuario {
-      background-color: #dcf8c6;
-      align-self: flex-start;
-    }
-
-    .bot {
-      background-color: #f1f0f0;
-      align-self: flex-end;
-    }
-
-    .fecha {
-      font-size: 12px;
-      color: #888;
-      text-align: right;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard WhatsApp</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
 </head>
 <body>
-  <h1>📬 Historial del Bot de WhatsApp</h1>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>MENÚ PRINCIPAL</h3>
+      <nav>
+        <a class="active">📊 Dashboard</a>
+        <a>💬 Chats</a>
+        <a>⚙️ Configuraciones</a>
+      </nav>
+      <h4>WHATSAPP</h4>
+      <nav>
+        <a>📨 Mensajes</a>
+        <a>👤 Contactos</a>
+        <a>📈 Estadísticas</a>
+      </nav>
+    </aside>
 
-  <div class="busqueda">
-    <input type="text" id="numero" placeholder="Ingresa número (ej. 51912345678)">
-    <button onclick="buscarMensajes()">Buscar</button>
-    <button onclick="verTodos()">Ver Todos</button>
+    <main class="main-content">
+      <section class="cards">
+        <div class="card blue">📩<strong>5</strong><span>Total Mensajes</span></div>
+        <div class="card green">👥<strong>2</strong><span>Contactos</span></div>
+        <div class="card purple">📈<strong>0</strong><span>Hoy</span></div>
+        <div class="card orange">📁<strong>55</strong><span>Chats Promedio</span></div>
+      </section>
+
+      <section class="search-bar">
+        <input type="text" placeholder="Buscar conversación" />
+        <button>Buscar</button>
+        <button class="view-all">Ver Todos</button>
+      </section>
+
+      <section class="dashboard-body">
+        <div class="recientes">
+          <h3>Contactos Recientes</h3>
+          <ul>
+            <li><strong>51987156634</strong><br /><small>Hola - 1/7/2025, 15:57</small></li>
+            <li><strong>51987654321</strong><br /><small>Hola desde testMongo - 1/7/2025, 15:32</small></li>
+          </ul>
+        </div>
+        <div class="actividad">
+          <h3>Actividad por Hora</h3>
+          <p>(Gráfico aquí)</p>
+        </div>
+        <div class="chat">
+          <h3>Chat: 51987156634</h3>
+          <p class="empty">No hay mensajes</p>
+        </div>
+      </section>
+    </main>
   </div>
-
-  <div id="output" class="chat-container">
-    <p style="text-align:center; color:#888;">Aquí aparecerán los mensajes...</p>
-  </div>
-
-  <script>
-    async function buscarMensajes() {
-      const numero = document.getElementById("numero").value.trim();
-      if (!numero) return alert("Ingresa un número válido");
-
-      const res = await fetch(`/api/messages/${encodeURIComponent(numero)}`);
-      const data = await res.json();
-      mostrar(data.messages);
-    }
-
-    async function verTodos() {
-      const res = await fetch('/api/messages');
-      const data = await res.json();
-      mostrar(data.messages);
-    }
-
-    function mostrar(mensajes) {
-      const container = document.getElementById("output");
-      container.innerHTML = "";
-
-      if (!mensajes || mensajes.length === 0) {
-        container.innerHTML = "<p style='text-align:center; color:#888;'>No se encontraron mensajes.</p>";
-        return;
-      }
-
-      mensajes.forEach(msg => {
-        const mensajeDiv = document.createElement("div");
-        mensajeDiv.classList.add("mensaje");
-
-        const userBubble = document.createElement("div");
-        userBubble.classList.add("burbuja", "usuario");
-        userBubble.textContent = msg.userMessage;
-
-        const botBubble = document.createElement("div");
-        botBubble.classList.add("burbuja", "bot");
-        botBubble.textContent = msg.botResponse;
-
-        const fecha = document.createElement("div");
-        fecha.classList.add("fecha");
-        fecha.textContent = new Date(msg.createdAt).toLocaleString();
-
-        mensajeDiv.appendChild(userBubble);
-        mensajeDiv.appendChild(botBubble);
-        mensajeDiv.appendChild(fecha);
-
-        container.appendChild(mensajeDiv);
-      });
-    }
-  </script>
 </body>
 </html>

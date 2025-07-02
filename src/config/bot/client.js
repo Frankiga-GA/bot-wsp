@@ -7,13 +7,15 @@ const makeWASocket = baileys.default;
 const { useMultiFileAuthState, fetchLatestBaileysVersion, DisconnectReason } =
   baileys;
 
+let sock; // 👈 Exportamos esta variable global para usarla luego
+
 const startBot = async () => {
   const { state, saveCreds } = await useMultiFileAuthState(
     "./src/config/bot/auth"
   );
   const { version } = await fetchLatestBaileysVersion();
 
-  const sock = makeWASocket({
+  sock = makeWASocket({
     version,
     auth: state,
     logger: P({ level: "silent" }),
@@ -55,7 +57,7 @@ const startBot = async () => {
   sock.ev.on("messages.upsert", async ({ messages, type }) => {
     if (type === "notify") {
       const msg = messages[0];
-      console.log('📥 Mensaje recibido:', msg);
+      console.log("📥 Mensaje recibido:", msg);
       if (!msg.key.fromMe && msg.message) {
         await handleIncomingMessage(sock, msg);
       }
@@ -63,4 +65,19 @@ const startBot = async () => {
   });
 };
 
+// ✅ NUEVA FUNCIÓN PARA USAR DESDE n8n U OTROS ARCHIVOS
+const sendMessage = async (number, message) => {
+  if (!sock) {
+    throw new Error("❌ El bot de WhatsApp no está conectado.");
+  }
+
+  const fullNumber = number.includes("@s.whatsapp.net")
+    ? number
+    : `${number}@s.whatsapp.net`;
+
+  await sock.sendMessage(fullNumber, { text: message });
+  console.log("📤 Mensaje enviado a:", fullNumber);
+};
+
+export { sendMessage };
 export default startBot;

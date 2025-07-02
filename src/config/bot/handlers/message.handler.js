@@ -1,5 +1,6 @@
 import { askLLM } from "../../../services/LLM/index.js";
 import { saveMessage, getAllMessagesByUser } from "../../../modules/shared/message.controller.js";
+import axios from "axios";
 
 const handleIncomingMessage = async (sock, msg) => {
   const from = msg.key.remoteJid; // Ej: "51987156634@s.whatsapp.net"
@@ -7,10 +8,8 @@ const handleIncomingMessage = async (sock, msg) => {
   const text = msg.message?.conversation?.trim();
   if (!text) return;
 
-  // Obtener historial de mensajes del usuario
   const historial = await getAllMessagesByUser(userNumber);
 
-  // Convertir historial a texto concatenado
   const contexto = historial
     .map(m => `🧑: ${m.userMessage}\n🤖: ${m.botResponse}`)
     .join('\n');
@@ -19,7 +18,14 @@ const handleIncomingMessage = async (sock, msg) => {
 
   const respuesta = await askLLM(promptFinal);
 
-  await saveMessage(userNumber, text, respuesta); // Guarda número limpio
+  await saveMessage(userNumber, text, respuesta);
+
+  // 🔗 Enviar al webhook de n8n
+  await axios.post("https://walrus-delicate-routinely.ngrok-free.app/webhook-test/nuevo-mensaje", {
+    userNumber,
+    userMessage: text,
+    botResponse: respuesta
+  });
 
   await sock.sendMessage(from, { text: respuesta });
 };

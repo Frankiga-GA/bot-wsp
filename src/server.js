@@ -5,6 +5,10 @@ import { connectToMongo } from "./config/mongodb/connection.js";
 import { countMessages, getMessagesAPI, getMessagesByUserAPI } from "./modules/shared/message.controller.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { handleBotResponse } from "./modules/shared/response.controller.js";
+
+
+
 
 dotenv.config();
 
@@ -49,9 +53,13 @@ routes() {
     res.sendFile(path.join(process.cwd(), "public", "index.html"));
   });
 
-  this.app.get("/api/messages", getMessagesAPI); // <-- esta línea es clave
+  this.app.get("/api/messages", getMessagesAPI);
   this.app.get("/api/messages/:numero", getMessagesByUserAPI);
+
+  // ✅ NUEVO: para que n8n envíe mensajes a través del bot
+  this.app.post("/api/send-response", handleBotResponse);
 }
+
 
 
   async startWhatsAppBot() {
