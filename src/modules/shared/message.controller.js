@@ -1,5 +1,7 @@
 import { MessageModel } from './message.model.js';
+import { sendMessage } from '../../config/bot/client.js'; // ✅ para enviar mensajes desde la API
 
+// Guarda mensaje en MongoDB
 export async function saveMessage(userNumber, userMessage, botResponse) {
   try {
     const msg = new MessageModel({ userNumber, userMessage, botResponse });
@@ -9,6 +11,7 @@ export async function saveMessage(userNumber, userMessage, botResponse) {
   }
 }
 
+// Contador total de mensajes
 export async function countMessages() {
   try {
     return await MessageModel.countDocuments();
@@ -18,6 +21,7 @@ export async function countMessages() {
   }
 }
 
+// Obtener historial por número
 export async function getAllMessagesByUser(userNumber) {
   try {
     return await MessageModel.find({ userNumber }).sort({ createdAt: 1 }).limit(20);
@@ -27,7 +31,7 @@ export async function getAllMessagesByUser(userNumber) {
   }
 }
 
-
+// Obtener todos los mensajes
 export async function getMessagesAPI(req, res) {
   try {
     const messages = await MessageModel.find().sort({ createdAt: -1 });
@@ -37,14 +41,10 @@ export async function getMessagesAPI(req, res) {
   }
 }
 
-
+// Obtener mensajes por número
 export async function getMessagesByUserAPI(req, res) {
   let { numero } = req.params;
-
-  // 🧼 Limpia el número: solo dígitos
-  numero = numero.replace(/[^0-9]/g, "");
-
-  // 🧩 Agrega el sufijo para buscar en Mongo
+  numero = numero.replace(/[^0-9]/g, ""); // limpia el número
   const numeroWhatsApp = `${numero}@s.whatsapp.net`;
 
   try {
@@ -53,5 +53,22 @@ export async function getMessagesByUserAPI(req, res) {
   } catch (error) {
     console.error("❌ Error en getMessagesByUserAPI:", error.message);
     res.status(500).json({ error: "Error al obtener mensajes por número" });
+  }
+}
+
+// ✅ NUEVO: Endpoint para enviar mensajes al bot desde n8n o cualquier sistema
+export async function sendMessageAPI(req, res) {
+  const { number, message } = req.body;
+
+  if (!number || !message) {
+    return res.status(400).json({ error: "Faltan parámetros: number y message" });
+  }
+
+  try {
+    await sendMessage(number, message);
+    res.json({ status: "ok", to: number, message });
+  } catch (error) {
+    console.error("❌ Error al enviar mensaje:", error.message);
+    res.status(500).json({ error: "Error enviando mensaje" });
   }
 }

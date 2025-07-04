@@ -6,7 +6,7 @@ import { countMessages, getMessagesAPI, getMessagesByUserAPI } from "./modules/s
 import path from "path";
 import { fileURLToPath } from "url";
 import { handleBotResponse } from "./modules/shared/response.controller.js";
-
+import { sendMessageAPI } from './modules/shared/message.controller.js';
 
 
 
@@ -58,6 +58,8 @@ routes() {
 
   // ✅ NUEVO: para que n8n envíe mensajes a través del bot
   this.app.post("/api/send-response", handleBotResponse);
+  this.app.post("/api/send-message", sendMessageAPI);
+
 }
 
 
