@@ -18,13 +18,13 @@ const __dirname = path.dirname(__filename);
 
 class Server {
   constructor() {
-    this.app = express();
-    this.port = process.env.PORT || 3000;
+  this.app = express();
+  this.port = process.env.PORT || 3000;
 
-    this.middlewares();
-    this.routes();
-    this.init();
-  }
+  this.middlewares();  // ✅ esto va primero
+  this.routes();       // luego van las rutas
+  this.init();         // después inicializas
+}
 
   async init() {
     await connectToMongo();
@@ -40,13 +40,12 @@ class Server {
   }
 
   middlewares() {
-    this.app.use(express.json());
+  this.app.use(express.json());  // ✅ este es el que parsea req.body
 
-    // ✅ Usamos correctamente __dirname
-    const publicPath = path.join(__dirname, "../public");
-    this.app.use(express.static(publicPath));
-    console.log("🟢 Sirviendo public desde:", publicPath);
-  }
+  const publicPath = path.join(__dirname, "../public");
+  this.app.use(express.static(publicPath));
+}
+
 
 routes() {
   this.app.get("/", (_, res) => {

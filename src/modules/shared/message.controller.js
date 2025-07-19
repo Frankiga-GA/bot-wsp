@@ -56,8 +56,12 @@ export async function getMessagesByUserAPI(req, res) {
   }
 }
 
-// ✅ NUEVO: Endpoint para enviar mensajes al bot desde n8n o cualquier sistema
 export async function sendMessageAPI(req, res) {
+  console.log("entro a sendMeesageApi")
+  if (!req.body || typeof req.body !== 'object') {
+    return res.status(400).json({ error: "Cuerpo de la petición inválido o vacío" });
+  }
+
   const { number, message } = req.body;
 
   if (!number || !message) {
@@ -65,7 +69,7 @@ export async function sendMessageAPI(req, res) {
   }
 
   try {
-    await sendMessage(number, message);
+    await sendMessage(`${number}@s.whatsapp.net`, message);
     res.json({ status: "ok", to: number, message });
   } catch (error) {
     console.error("❌ Error al enviar mensaje:", error.message);
